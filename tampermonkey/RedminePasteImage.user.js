@@ -42,6 +42,33 @@
             target.value = target.value.substring(0, st) + fileWiki + target.value.substring(ed);
             target.setSelectionRange(st + fileWiki.length, st + fileWiki.length);
         }
+        const createImg = function(blob, alt) {
+            var img = document.createElement("img");
+            var reader = new FileReader();
+            reader.onload = function() {
+                img.src = reader.result;
+            }
+            reader.readAsDataURL(blob);
+            img.onclick = function() {
+                if ( this.getAttribute("ume.expand") ) {
+                    img.style.width = "20px";
+                    img.title = "クリックして拡大";
+                    this.removeAttribute("ume.expand", false );
+                } else {
+                    img.style.width = "";
+                    img.title = "クリックして縮小";
+                    this.setAttribute("ume.expand", true );
+                }
+            }
+            Object.assign(img.style, {
+                width: "20px",
+                display: "block",
+                cursor: "pointer"
+            });
+            img.alt = alt;
+            img.title = "クリックして拡大";
+            return img;
+        }
         var blob = getPastedBlob(e);
         if ( blob === undefined ) return;
         if ( blob ) {
@@ -51,6 +78,8 @@
             if ( e.target.tagName.toLowerCase() == "textarea" ) {
                 insFileName(filename, e.target);
             }
+            var img = createImg(blob);
+            document.querySelector("span.attachments_fields")?.appendChild(img);
         }
     };
 
