@@ -51,17 +51,17 @@
             reader.readAsDataURL(blob);
             img.onclick = function() {
                 if ( this.getAttribute("ume.expand") ) {
-                    img.style.width = "20px";
+                    img.style.height = "20px";
                     img.title = "クリックして拡大";
                     this.removeAttribute("ume.expand", false );
                 } else {
-                    img.style.width = "";
+                    img.style.height = "";
                     img.title = "クリックして縮小";
                     this.setAttribute("ume.expand", true );
                 }
             }
             Object.assign(img.style, {
-                width: "20px",
+                height: "20px",
                 display: "block",
                 cursor: "pointer"
             });
