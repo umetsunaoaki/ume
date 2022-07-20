@@ -79,7 +79,7 @@
                 insFileName(filename, e.target);
             }
             var img = createImg(blob);
-            document.querySelector("span.attachments_fields span:last-child")?.appendChild(img);
+            document.querySelector("span.attachments_fields")?.appendChild(img);
         }
     };
 
