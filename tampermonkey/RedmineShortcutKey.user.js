@@ -18,6 +18,7 @@
     /** ショートカットキー機能 */
 
     // 次の項目・前の項目
+    const SCROLL_MARGIN = 100;
     let marker = document.createElement("div");
     Object.assign(marker.style, {
         position: "absolute",
@@ -47,7 +48,7 @@
         marker.style.left = (left - bodyL) + "px";
         marker.style.top = (top - bodyT) + "px";
         marker.style.height = height + "px";
-        scrollTo({top: top-bodyT, behavior: "smooth"});
+        scrollTo({top: top-bodyT-SCROLL_MARGIN, behavior: "smooth"});
         //targets[idx].scrollIntoView({behavior: "smooth", block: "center"}); // body が対応していない
     };
     // キーマッピング
