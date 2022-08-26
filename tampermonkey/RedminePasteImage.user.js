@@ -14,12 +14,87 @@
     'use strict';
 
     // Your code here...
+    const pasteHandler = function(e){
+        var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+                imagePasteHandler(e);
+            } else if (items[i].type === "text/plain") {
+                e.preventDefault();
+                textPasteHandler(e);
+            }
+        }
+    };
+    const textPasteHandler = function(e){
+        const isTableFormat = function(s){
+            // タブで区切ると全行が同じ長さになること
+            var lenSet = new Set();
+            var lines = s.replace(/[\r\n]+$/, "").split(/\r\n|\r|\n/);
+            if ( lines.length <= 1 ) return false;
+            lines.forEach((line, i) => {
+                lenSet.add(line.split("\t").length);
+            });
+            if ( lenSet.size != 1 ) return false;
+            if ( lenSet.has(1) ) return false;
+            return true;
+        };
+        const insText = function(src, target) {
+            var st = target.selectionStart;
+            var ed = target.selectionEnd;
+            target.value = target.value.substring(0, st) + src + target.value.substring(ed);
+            target.setSelectionRange(st + src.length, st + src.length);
+        };
+        const strCount = function(str) {
+            let hanLen = String(str).match(/[\x01-\x7E\uFF65-\uFF9F]/g)?.length;
+            return str.length + str.length - (hanLen??0);
+        }
+        const createTableMarkdown = function(s) {
+            var result = [];
+            var colLen = [];
+            var pad = (str, cnt, pad) => {
+                let len = strCount(str);
+                if ( len >= cnt ) return pad+str+pad;
+                return pad + str + pad.repeat(cnt - len + 1);
+            };
+            s.split(/\r\n|\r|\n/).forEach(line=>{
+                line.split("\t").forEach((col, i) => {
+                    let len = strCount(col);
+                    if ( colLen.length <= i ) colLen[i] = len;
+                    else colLen[i] = Math.max(colLen[i], len);
+                });
+            });
+            s.split(/\r\n|\r|\n/).forEach((line, i)=>{
+                result.push("|" + line.split("\t").map((col, j) => {
+                    let len = col.length + (col.length - strCount(col));
+                    return pad(col, colLen[j], " ");
+                }).join("|") + "|");
+                if ( i == 0 ) result.push("|" + colLen.map((i) => pad("", i, "-")).join("|") + "|");
+            });
+            return result.join("\r\n");
+        };
+        if ( e.target.tagName.toLowerCase() != "textarea" ) return;
+        var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type === "text/plain") {
+                items[i].getAsString((s) => {
+                    if ( isTableFormat(s) ) {
+                        var text = createTableMarkdown(s.replace(/[\r\n]+$/, ""));
+                        insText(text, e.target);
+                    } else {
+                        console.log("not table");
+                        insText(s, e.target);
+                    }
+                });
+            }
+        }
+    };
     const imagePasteHandler = function(e){
         if( typeof(addFile) != "function" ) return;
         const getPastedBlob = function(e) {
             var blob = undefined;
             var items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (var i = 0; i < items.length; i++) {
+                console.log("type = " + items[i].type);
                 if (items[i].type.indexOf("image") === 0) {
                     blob = items[i].getAsFile();
                     e.preventDefault();
@@ -83,7 +158,7 @@
         }
     };
 
-    document.querySelector("textarea#issue_notes.wiki-edit")?.addEventListener("paste", imagePasteHandler);
-    document.querySelector("textarea#issue_description.wiki-edit")?.addEventListener("paste", imagePasteHandler);
-    document.querySelector("textarea#content_text.wiki-edit")?.addEventListener("paste", imagePasteHandler);
+    document.querySelector("textarea#issue_notes.wiki-edit")?.addEventListener("paste", pasteHandler);
+    document.querySelector("textarea#issue_description.wiki-edit")?.addEventListener("paste", pasteHandler);
+    document.querySelector("textarea#content_text.wiki-edit")?.addEventListener("paste", pasteHandler);
 })();
