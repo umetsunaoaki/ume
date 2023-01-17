@@ -42,7 +42,8 @@
             var st = target.selectionStart;
             var ed = target.selectionEnd;
             target.value = target.value.substring(0, st) + src + target.value.substring(ed);
-            target.setSelectionRange(st + src.length, st + src.length);
+            var src_len = src.replace(/\r\n/g, "\n").length;
+            target.setSelectionRange(st + src_len, st + src_len);
         };
         const strCount = function(str) {
             let hanLen = String(str).match(/[\x01-\x7E\uFF65-\uFF9F]/g)?.length;
