@@ -215,7 +215,8 @@
         top: 0,
         left: 0,
         backgroundColor: "rgb(0,0,0,0.7)",
-        display: "none"
+        display: "none",
+        zIndex: 9,
     });
     var helpBody = document.createElement("div");
     Object.assign(helpBody.style, {
