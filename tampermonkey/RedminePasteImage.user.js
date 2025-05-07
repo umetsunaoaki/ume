@@ -17,9 +17,7 @@
     const pasteHandler = function(e){
         var items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (var i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") === 0) {
-                imagePasteHandler(e);
-            } else if (items[i].type === "text/plain") {
+            if (items[i].type === "text/plain") {
                 e.preventDefault();
                 textPasteHandler(e);
             }
@@ -89,6 +87,7 @@
             }
         }
     };
+    // 新しい Redmine で画像貼り付けをサポートしたので、この function はもう使わない
     const imagePasteHandler = function(e){
         if( typeof(addFile) != "function" ) return;
         const getPastedBlob = function(e) {
